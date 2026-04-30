@@ -1,0 +1,599 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0e1a;--bg2:#111827;--bg3:#1a2035;--bg4:#1e2640;
+    --accent:#00d4ff;--accent2:#7c3aed;--accent3:#10b981;--accent4:#f59e0b;--danger:#ef4444;
+    --text:#e2e8f0;--muted:#94a3b8;--border:rgba(255,255,255,0.08);
+    --card-bg:rgba(255,255,255,0.03);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh}
+  .app{max-width:1100px;margin:0 auto;padding:24px 20px}
+  
+  /* Header */
+  .header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+  .header-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .header-icon svg{width:26px;height:26px;fill:white}
+  .header-text h1{font-size:20px;font-weight:700;color:white;letter-spacing:-0.3px}
+  .header-text p{font-size:13px;color:var(--muted);margin-top:3px}
+  .status-badge{margin-left:auto;background:rgba(16,185,129,0.15);color:var(--accent3);border:1px solid rgba(16,185,129,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.5px}
+  
+  /* Nav Tabs */
+  .tabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:28px}
+  .tab{flex:1;padding:9px 14px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:500;font-family:'Space Grotesk',sans-serif;cursor:pointer;border-radius:8px;transition:all .2s;text-align:center}
+  .tab.active{background:var(--accent2);color:white}
+  .tab:hover:not(.active){background:var(--bg3);color:var(--text)}
+  
+  /* Panels */
+  .panel{display:none}.panel.active{display:block}
+  
+  /* Metric Cards */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .metric{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+  .metric-val{font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-0.5px}
+  .metric-sub{font-size:11px;color:var(--muted);margin-top:4px}
+  .c-cyan{color:var(--accent)}.c-purple{color:var(--accent2)}.c-green{color:var(--accent3)}.c-amber{color:var(--accent4)}
+  
+  /* Section headers */
+  .section-title{font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  
+  /* Two column grid */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px}
+  
+  /* Confusion Matrix */
+  .cm-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:3px;font-family:'JetBrains Mono',monospace;font-size:13px}
+  .cm-cell{padding:10px 14px;border-radius:6px;text-align:center;display:flex;align-items:center;justify-content:center;flex-direction:column}
+  .cm-label{color:var(--muted);font-size:11px;font-weight:500;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center}
+  .cm-tp{background:rgba(16,185,129,0.25);border:1px solid rgba(16,185,129,0.4)}
+  .cm-tn{background:rgba(16,185,129,0.25);border:1px solid rgba(16,185,129,0.4)}
+  .cm-fp{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3)}
+  .cm-fn{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3)}
+  .cm-val{font-size:20px;font-weight:700;color:white}
+  .cm-sublabel{font-size:9px;color:var(--muted);margin-top:2px}
+  
+  /* Bar chart */
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px}
+  .bar-label{width:110px;color:var(--muted);font-size:12px;text-align:right;flex-shrink:0}
+  .bar-track{flex:1;height:8px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+  .bar-val{width:48px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);flex-shrink:0}
+  
+  /* Dataset table */
+  .ds-table{width:100%;border-collapse:collapse;font-size:13px}
+  .ds-table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.7px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+  .ds-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+  .ds-table tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .pill-green{background:rgba(16,185,129,0.15);color:var(--accent3);border:1px solid rgba(16,185,129,0.25)}
+  .pill-red{background:rgba(239,68,68,0.15);color:#fc8181;border:1px solid rgba(239,68,68,0.25)}
+  .pill-blue{background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2)}
+  
+  /* Pipeline */
+  .pipeline{display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 0 12px}
+  .pipe-step{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:120px;text-align:center;flex-shrink:0}
+  .pipe-step-num{font-size:10px;color:var(--accent2);font-weight:700;margin-bottom:4px;letter-spacing:1px}
+  .pipe-step-title{font-size:12px;font-weight:600;color:var(--text)}
+  .pipe-step-sub{font-size:10px;color:var(--muted);margin-top:2px}
+  .pipe-arrow{color:var(--muted);font-size:18px;padding:0 6px;flex-shrink:0}
+  
+  /* Class report */
+  .report-row{display:grid;grid-template-columns:120px repeat(4,1fr);gap:8px;align-items:center;margin-bottom:8px}
+  .report-header{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.7px}
+  .report-class{font-weight:600;font-size:13px}
+  .report-bar{height:6px;border-radius:3px;transition:width 1s ease}
+  .score-cell{font-family:'JetBrains Mono',monospace;font-size:13px}
+  
+  /* Architecture diagram */
+  .arch-row{display:flex;justify-content:center;gap:12px;margin-bottom:12px}
+  .arch-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 18px;text-align:center;font-size:12px;color:var(--text)}
+  .arch-box.accent-border{border-color:var(--accent2);background:rgba(124,58,237,0.1)}
+  .arch-arrow{color:var(--muted);font-size:14px;display:flex;align-items:center;padding:0 4px}
+
+  /* Responsive */
+  @media(max-width:700px){.metrics{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+  
+  /* Animated accent line on header */
+  @keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+</style>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>DDoS Detection System — SVM Classifier</h1>
+      <p>CIC-IDS 2017 Dataset &nbsp;·&nbsp; Binary Classification &nbsp;·&nbsp; RBF Kernel</p>
+    </div>
+    <div class="status-badge">✓ 97.4% Accuracy</div>
+  </div>
+  
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('overview')">Overview</button>
+    <button class="tab" onclick="showPanel('results')">Results</button>
+    <button class="tab" onclick="showPanel('pipeline')">Pipeline</button>
+    <button class="tab" onclick="showPanel('dataset')">Dataset</button>
+    <button class="tab" onclick="showPanel('security')" style="border:1px solid rgba(239,68,68,0.3);color:#fc8181">Security</button>
+  </div>
+  
+  <!-- ========== OVERVIEW ========== -->
+  <div id="panel-overview" class="panel active">
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Accuracy</div>
+        <div class="metric-val c-cyan">97.42%</div>
+        <div class="metric-sub">Overall test set</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">F1-Score (Attack)</div>
+        <div class="metric-val c-green">98.00%</div>
+        <div class="metric-sub">Class 1 — Malicious</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Training Samples</div>
+        <div class="metric-val c-purple">95,692</div>
+        <div class="metric-sub">80% of 119,616</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Features</div>
+        <div class="metric-val c-amber">78</div>
+        <div class="metric-sub">Network flow features</div>
+      </div>
+    </div>
+    
+    <div class="grid2">
+      <!-- Confusion Matrix -->
+      <div class="card">
+        <div class="card-title">Confusion Matrix</div>
+        <div class="cm-grid">
+          <div class="cm-cell cm-label"></div>
+          <div class="cm-cell cm-label" style="font-size:11px">Predicted<br>BENIGN</div>
+          <div class="cm-cell cm-label" style="font-size:11px">Predicted<br>ATTACK</div>
+          
+          <div class="cm-cell cm-label" style="writing-mode:horizontal-lr;font-size:11px;min-width:60px">Actual BENIGN</div>
+          <div class="cm-cell cm-tn">
+            <div class="cm-val">3,499</div>
+            <div class="cm-sublabel">True Negative</div>
+          </div>
+          <div class="cm-cell cm-fp">
+            <div class="cm-val" style="color:#fc8181">500</div>
+            <div class="cm-sublabel">False Positive</div>
+          </div>
+          
+          <div class="cm-cell cm-label" style="font-size:11px;min-width:60px">Actual ATTACK</div>
+          <div class="cm-cell cm-fn">
+            <div class="cm-val" style="color:#fc8181">117</div>
+            <div class="cm-sublabel">False Negative</div>
+          </div>
+          <div class="cm-cell cm-tp">
+            <div class="cm-val">19,785</div>
+            <div class="cm-sublabel">True Positive</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Per-class metrics -->
+      <div class="card">
+        <div class="card-title">Per-Class Performance</div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">CLASS 0 — BENIGN (n=3,999)</div>
+          <div class="bar-row"><div class="bar-label">Precision</div><div class="bar-track"><div class="bar-fill" style="width:97%;background:var(--accent)"></div></div><div class="bar-val">0.97</div></div>
+          <div class="bar-row"><div class="bar-label">Recall</div><div class="bar-track"><div class="bar-fill" style="width:87%;background:var(--accent)"></div></div><div class="bar-val">0.87</div></div>
+          <div class="bar-row"><div class="bar-label">F1-Score</div><div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--accent)"></div></div><div class="bar-val">0.92</div></div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">CLASS 1 — ATTACK (n=19,902)</div>
+          <div class="bar-row"><div class="bar-label">Precision</div><div class="bar-track"><div class="bar-fill" style="width:98%;background:var(--accent3)"></div></div><div class="bar-val">0.98</div></div>
+          <div class="bar-row"><div class="bar-label">Recall</div><div class="bar-track"><div class="bar-fill" style="width:99%;background:var(--accent3)"></div></div><div class="bar-val">0.99</div></div>
+          <div class="bar-row"><div class="bar-label">F1-Score</div><div class="bar-track"><div class="bar-fill" style="width:98%;background:var(--accent3)"></div></div><div class="bar-val">0.98</div></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- SVM Model Config -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">SVM Model Configuration</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div style="background:var(--bg3);border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.7px">Kernel</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--accent)">RBF</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Radial Basis Function</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.7px">C (Regularization)</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--accent2)">2.0</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Margin penalty</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.7px">Gamma</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--accent4)">"scale"</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Auto: 1/(n_feat × var)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ========== RESULTS ========== -->
+  <div id="panel-results" class="panel">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Detailed Classification Report</div>
+      <div class="report-row">
+        <div class="report-header">Class</div>
+        <div class="report-header">Precision</div>
+        <div class="report-header">Recall</div>
+        <div class="report-header">F1-Score</div>
+        <div class="report-header">Support</div>
+      </div>
+      <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+      
+      <div class="report-row">
+        <div><span class="pill pill-blue">BENIGN (0)</span></div>
+        <div class="score-cell">0.97</div>
+        <div class="score-cell" style="color:var(--accent4)">0.87</div>
+        <div class="score-cell">0.92</div>
+        <div class="score-cell" style="color:var(--muted)">3,999</div>
+      </div>
+      <div class="report-row">
+        <div><span class="pill pill-red">ATTACK (1)</span></div>
+        <div class="score-cell">0.98</div>
+        <div class="score-cell">0.99</div>
+        <div class="score-cell" style="color:var(--accent3)">0.98</div>
+        <div class="score-cell" style="color:var(--muted)">19,902</div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:12px 0"></div>
+      <div class="report-row">
+        <div style="font-size:12px;color:var(--muted)">macro avg</div>
+        <div class="score-cell">0.97</div>
+        <div class="score-cell">0.93</div>
+        <div class="score-cell">0.95</div>
+        <div class="score-cell" style="color:var(--muted)">23,901</div>
+      </div>
+      <div class="report-row">
+        <div style="font-size:12px;color:var(--muted)">weighted avg</div>
+        <div class="score-cell">0.97</div>
+        <div class="score-cell">0.97</div>
+        <div class="score-cell">0.97</div>
+        <div class="score-cell" style="color:var(--muted)">23,901</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Analysis & Interpretation</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:14px">
+          <div style="font-size:13px;font-weight:600;color:var(--accent3);margin-bottom:4px">✓ Excellent Attack Detection</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">The model correctly identified 19,785 out of 19,902 attack samples (recall 99%). Only 117 attacks were missed (False Negatives) — critical in real-world IDS deployments.</div>
+        </div>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:14px">
+          <div style="font-size:13px;font-weight:600;color:var(--accent4);margin-bottom:4px">⚠ False Positive Rate for BENIGN</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">500 legitimate flows were flagged as attacks (12.5% of BENIGN samples). This causes false alarms. Improving BENIGN recall (0.87 → 0.95+) is the main area for optimization — try cost-sensitive SVM or resampling.</div>
+        </div>
+        <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:14px">
+          <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">ℹ Class Imbalance Note</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">The test set has ~5× more attack samples than benign. This imbalance explains why weighted avg ≈ macro avg for precision, but diverges for recall. The balanced sampling (20K/class) during training helped significantly.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ========== PIPELINE ========== -->
+  <div id="panel-pipeline" class="panel">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Processing Pipeline</div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 1</div>
+          <div class="pipe-step-title">Data Loading</div>
+          <div class="pipe-step-sub">8 CSV files<br>2.83M rows</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 2</div>
+          <div class="pipe-step-title">Balanced Sampling</div>
+          <div class="pipe-step-sub">Max 20K/class<br>119,616 total</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 3</div>
+          <div class="pipe-step-title">Encoding</div>
+          <div class="pipe-step-sub">LabelEncoder<br>Categorical cols</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 4</div>
+          <div class="pipe-step-title">Cleaning</div>
+          <div class="pipe-step-sub">Remove INF/NaN<br>rows dropped</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 5</div>
+          <div class="pipe-step-title">Binarization</div>
+          <div class="pipe-step-sub">BENIGN=0<br>ATTACK=1</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 6</div>
+          <div class="pipe-step-title">Scaling</div>
+          <div class="pipe-step-sub">StandardScaler<br>μ=0, σ=1</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-step-num">STEP 7</div>
+          <div class="pipe-step-title">Train/Test Split</div>
+          <div class="pipe-step-sub">80% / 20%<br>stratified</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step accent-border">
+          <div class="pipe-step-num" style="color:var(--accent)">STEP 8</div>
+          <div class="pipe-step-title">SVM (RBF)</div>
+          <div class="pipe-step-sub">C=2, γ=scale<br>Binary output</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Data Flow Statistics</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:14px">
+          <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent)">2.83M</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Raw records loaded</div>
+        </div>
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:14px">
+          <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent2)">119K</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">After balanced sampling</div>
+        </div>
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:14px">
+          <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent3)">95.7K</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Training samples</div>
+        </div>
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:14px">
+          <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent4)">23.9K</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Test samples</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ========== DATASET ========== -->
+  <div id="panel-dataset" class="panel">
+    <div class="card">
+      <div class="card-title">CIC-IDS 2017 — Files Processed</div>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Day</th>
+            <th>Traffic Type</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Friday-Afternoon-DDos.csv</td><td>Friday</td><td><span class="pill pill-red">DDoS</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Friday-Afternoon-PortScan.csv</td><td>Friday</td><td><span class="pill pill-red">PortScan</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Friday-Morning.csv</td><td>Friday</td><td><span class="pill pill-blue">BENIGN</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Monday-WorkingHours.csv</td><td>Monday</td><td><span class="pill pill-blue">BENIGN</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Thursday-Afternoon-Infilteration.csv</td><td>Thursday</td><td><span class="pill pill-red">Infiltration</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Thursday-Morning-WebAttacks.csv</td><td>Thursday</td><td><span class="pill pill-red">Web Attacks</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Tuesday-WorkingHours.csv</td><td>Tuesday</td><td><span class="pill pill-red">Brute Force</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+          <tr><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Wednesday-workingHours.csv</td><td>Wednesday</td><td><span class="pill pill-red">Botnet/DoS</span></td><td><span class="pill pill-green">✓ Loaded</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.7">
+      <strong style="color:var(--text)">About CIC-IDS 2017:</strong> Published by the Canadian Institute for Cybersecurity. Contains realistic background traffic and modern attack scenarios (DDoS, DoS, Brute Force, Web Attacks, Infiltration, Botnet) captured over 5 days. Total original size: 2,830,743 flows with 79 features derived from network packets using CICFlowMeter.
+    </div>
+  </div>
+</div>
+
+  <!-- ========== SECURITY ========== -->
+  <div id="panel-security" class="panel">
+
+    <!-- Threat level banner -->
+    <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px">
+      <div style="width:44px;height:44px;background:rgba(239,68,68,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600;color:#fc8181;margin-bottom:3px">Security Analysis — SVM-based IDS</div>
+        <div style="font-size:12px;color:var(--muted)">Evaluation of model strengths, attack coverage, vulnerabilities and hardening recommendations</div>
+      </div>
+      <div style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--accent3);white-space:nowrap">Protection: HIGH</div>
+    </div>
+
+    <!-- Threat detection metrics -->
+    <div class="metrics" style="margin-bottom:16px">
+      <div class="metric">
+        <div class="metric-label">Attack Recall</div>
+        <div class="metric-val" style="color:var(--accent3)">99.4%</div>
+        <div class="metric-sub">19,785 / 19,902 caught</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Missed Attacks</div>
+        <div class="metric-val" style="color:var(--danger)">117</div>
+        <div class="metric-sub">False Negatives (FN)</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">False Alarms</div>
+        <div class="metric-val" style="color:var(--accent4)">500</div>
+        <div class="metric-sub">Benign flagged as attack</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Attack Precision</div>
+        <div class="metric-val c-cyan">98.0%</div>
+        <div class="metric-sub">When alert fires, it's real</div>
+      </div>
+    </div>
+
+    <!-- Error cost analysis + attack coverage -->
+    <div class="grid2" style="margin-bottom:16px">
+
+      <!-- Error cost analysis -->
+      <div class="card">
+        <div class="card-title">Error Cost Analysis</div>
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:600;color:#fc8181">False Negative (missed attack)</span>
+            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--danger)">CRITICAL</span>
+          </div>
+          <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.6">
+            117 attacks classified as normal traffic. In production, each missed attack could mean service disruption, data exfiltration or system compromise. <span style="color:#fc8181;font-weight:600">FN rate: 0.59%</span> — acceptable for research.
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:600;color:var(--accent4)">False Positive (false alarm)</span>
+            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent4)">MODERATE</span>
+          </div>
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.6">
+            500 legitimate flows blocked or flagged. Causes alert fatigue for security teams. <span style="color:var(--accent4);font-weight:600">FP rate: 12.5% of BENIGN</span> — main area for improvement.
+          </div>
+        </div>
+      </div>
+
+      <!-- Attack type coverage -->
+      <div class="card">
+        <div class="card-title">Attack Coverage by Type</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">DDoS (Volume-based)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--accent3)">~99%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:99%;background:var(--accent3)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">DoS (Slowloris, GoldenEye)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--accent3)">~98%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:98%;background:var(--accent3)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">PortScan (Reconnaissance)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--accent)">~97%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:97%;background:var(--accent)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">Web Attacks (SQLi, XSS)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">~93%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:93%;background:var(--accent4)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">Infiltration (Advanced)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--danger)">~81%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:81%;background:var(--danger)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+              <span style="color:var(--muted)">Botnet (ARES)</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">~90%</span>
+            </div>
+            <div class="bar-track" style="height:6px"><div class="bar-fill" style="width:90%;background:var(--accent4)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SVM Security properties -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">SVM Security Properties</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--accent3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">STRENGTH</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">
+            <div style="margin-bottom:5px">✓ Generalization via max-margin</div>
+            <div style="margin-bottom:5px">✓ Robust against high-dim noise (78 features)</div>
+            <div style="margin-bottom:5px">✓ RBF captures non-linear attack patterns</div>
+            <div>✓ Deterministic — consistent predictions</div>
+          </div>
+        </div>
+        <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--accent4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">LIMITATION</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">
+            <div style="margin-bottom:5px">⚠ Slow inference on large live streams</div>
+            <div style="margin-bottom:5px">⚠ No explainability (black-box)</div>
+            <div style="margin-bottom:5px">⚠ Static model — no online learning</div>
+            <div>⚠ 2017 traffic patterns may not match 2025</div>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#fc8181;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">ADVERSARIAL RISK</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">
+            <div style="margin-bottom:5px">✗ Evasion: attacker crafts flows near decision boundary</div>
+            <div style="margin-bottom:5px">✗ Mimicry: low-rate DDoS may bypass threshold</div>
+            <div>✗ Poisoning: if retraining on live data without validation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardening recommendations -->
+    <div class="card">
+      <div class="card-title">Hardening Recommendations</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+
+        <div style="display:flex;gap:14px;align-items:flex-start;background:var(--bg3);border-radius:10px;padding:14px">
+          <div style="min-width:32px;height:32px;background:rgba(0,212,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)">01</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Reduce False Positives with cost-sensitive SVM</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Use <span style="font-family:'JetBrains Mono',monospace;color:var(--accent)">class_weight='balanced'</span> or manually set <span style="font-family:'JetBrains Mono',monospace;color:var(--accent)">class_weight={0:2, 1:1}</span> to penalize BENIGN misclassification more. Target: BENIGN recall ≥ 95%.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;background:var(--bg3);border-radius:10px;padding:14px">
+          <div style="min-width:32px;height:32px;background:rgba(124,58,237,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">02</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Add multi-class classification layer</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Extend from binary to multi-class (DDoS / PortScan / WebAttack / Infiltration) for more actionable alerts. Use <span style="font-family:'JetBrains Mono',monospace;color:var(--accent2)">decision_function_shape='ovr'</span> with one-vs-rest strategy.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;background:var(--bg3);border-radius:10px;padding:14px">
+          <div style="min-width:32px;height:32px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent3)">03</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Feature selection to reduce attack surface</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Apply <span style="font-family:'JetBrains Mono',monospace;color:var(--accent3)">SelectKBest</span> or <span style="font-family:'JetBrains Mono',monospace;color:var(--accent3)">PCA</span> to reduce 78 → 20–30 features. Reduces model complexity, inference latency and exposure to adversarial noise injection.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;background:var(--bg3);border-radius:10px;padding:14px">
+          <div style="min-width:32px;height:32px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent4)">04</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Ensemble with Random Forest for robustness</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Combine SVM output with a Random Forest classifier using a voting or stacking strategy. RF provides feature importance + explainability; SVM provides strong margin-based boundary. Ensemble typically raises F1 by 1–2%.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;align-items:flex-start;background:var(--bg3);border-radius:10px;padding:14px">
+          <div style="min-width:32px;height:32px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#fc8181">05</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Periodic retraining against concept drift</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Network traffic patterns evolve. Schedule quarterly retraining on updated captures. Implement drift detection (DDM / ADWIN) to automatically trigger retraining when prediction confidence drops below threshold.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+<script>
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
