@@ -1,0 +1,137 @@
+============================================================
+  🎬 SCRIPT VIDÉO — DDoS Detection System (SVM Classifier)
+  Dashboard Presentation | CIC-IDS 2017
+============================================================
+
+──────────────────────────────────────────────────────────
+INTRO  (0:00 – 0:20)
+──────────────────────────────────────────────────────────
+"السلام عليكم، في هاد الفيديو راح نشرحو مشروع détection
+ dyel hجومات DDoS باستخدام algorithme SVM.
+ l-projet مبني على dataset réelle اسمها CIC-IDS 2017،
+ وعندنا dashboard يبيّن النتائج بالتفصيل."
+
+──────────────────────────────────────────────────────────
+PARTIE 1 — DATASET  (0:20 – 1:00)
+──────────────────────────────────────────────────────────
+[SHOW: Tab "Dataset"]
+
+"l-dataset جاءت من Canadian Institute for Cybersecurity.
+ فيها أكثر من 2.8 مليون flow réseau، مسجلين على مدى 5 أيام.
+
+ كل يوم عنده نوع معين ديال هجمات:
+ — الجمعة: DDoS و PortScan
+ — الخميس: Web Attacks و Infiltration
+ — الثلاثاء: Brute Force
+ — الأربعاء: Botnet و DoS
+
+ قدرنا نحمّلو 8 ملفات CSV، كل واحد فيه نوع مختلف.
+ ف النهاية استعملنا 119,616 عيّنة —
+ 80% للتدريب و 20% للاختبار،
+ مع 78 feature مستخرجة من network packets."
+
+──────────────────────────────────────────────────────────
+PARTIE 2 — PIPELINE  (1:00 – 1:50)
+──────────────────────────────────────────────────────────
+[SHOW: Tab "Pipeline"]
+
+"خلّينا نشوفو pipeline dyel l-modèle خطوة بخطوة:
+
+ 1. DATA LOADING — حمّلنا l-CSV files وجمعناهم في DataFrame
+    واحد.
+
+ 2. CLEANING — حذفنا les colonnes بـ NaN أو Infinity، وحوّلنا
+    les labels لـ binaire: BENIGN = 0، باقي الهجمات = 1.
+
+ 3. SCALING — استعملنا StandardScaler باش n-normalize les
+    features، هادا ضروري بزاف لـ SVM.
+
+ 4. TRAIN/TEST SPLIT — 80% training، 20% testing،
+    مع stratify باش تبقى l-classes موزّعة.
+
+ 5. SVM TRAINING — دربّنا SVC بـ:
+    • kernel = RBF (Radial Basis Function)
+    • C = 2.0 (regularization)
+    • gamma = 'scale' (auto-calculated)
+
+ 6. EVALUATION — حسبنا accuracy، F1-score، confusion matrix،
+    وclassification report كامل."
+
+──────────────────────────────────────────────────────────
+PARTIE 3 — RÉSULTATS  (1:50 – 2:40)
+──────────────────────────────────────────────────────────
+[SHOW: Tab "Overview" then "Results"]
+
+"دابا نشوفو النتائج — وهنا كاين شي حاجة مزيانة:
+
+ ✅ Accuracy: 97.42% — النموذج صح في معظم الحالات.
+ ✅ F1-Score للهجمات: 98% — كاين توازن بين precision وrecall.
+ ✅ Training Samples: 95,692 عيّنة
+ ✅ 78 feature réseau
+
+ ف Confusion Matrix:
+ — True Positive: 19,785 هجمة اكتُشفت صح ✅
+ — True Negative: 3,499 trafic normal تعرف عليه ✅
+ — False Negative: 117 هجمة فاتت — هاداك الخطر الأكبر ⚠️
+ — False Positive: 500 تنبيه خاطئ — أي trafic normal تصنّف
+   غلط كهجمة
+
+ للفئة BENIGN:
+   Precision 0.97 / Recall 0.87 / F1 0.92
+
+ للفئة ATTACK:
+   Precision 0.98 / Recall 0.99 / F1 0.98
+
+ النموذج ممتاز في اكتشاف الهجمات،
+ لكن كاين شوية false alarms على trafic normal."
+
+──────────────────────────────────────────────────────────
+PARTIE 4 — SECURITY ANALYSIS  (2:40 – 3:30)
+──────────────────────────────────────────────────────────
+[SHOW: Tab "Security"]
+
+"Tab Security يعطينا تحليل أعمق:
+
+ STRENGTHS:
+ — SVM باغي margin أقصى — هاد الشي يعطيه généralisation مزيانة
+ — قادر يتعامل مع 78 feature بدون ما يعيا
+ — kernel RBF يلتقط les patterns non-linéaires ديال الهجمات
+
+ LIMITATIONS:
+ — Inference بطيء على live streams ضخمة
+ — ما عندوش explainability — صعب تعرف علاش قرر هكذا
+ — static model — ما يتعلّمش من data جديدة تلقائياً
+
+ ADVERSARIAL RISKS:
+ — Evasion: attacker يصنع flows قريبة من decision boundary
+ — Mimicry: هجمة بـ rate منخفض ممكن تفوت
+ — Poisoning: إلا retraining بدون validation
+
+ HARDENING RECOMMENDATIONS:
+ 01 — استعمل class_weight='balanced' باش تقلّل FP على BENIGN
+ 02 — زيد multi-class classification (DDoS / PortScan / WebAttack)
+ 03 — SelectKBest أو PCA تقلّل 78 → 20-30 feature
+ 04 — Ensemble مع Random Forest — يزيد F1 بـ 1-2%
+ 05 — Retrain كل ربع سنة مع drift detection"
+
+──────────────────────────────────────────────────────────
+CONCLUSION  (3:30 – 3:50)
+──────────────────────────────────────────────────────────
+"ف الأخير، هاد النموذج ديال SVM مع RBF kernel
+ أثبت نفسه في اكتشاف الهجمات بـ 97.4% accuracy.
+
+ النقطة الإيجابية هي recall مرتفع للهجمات (99.4%)،
+ والنقطة اللي خاصها تحسين هي false positives على trafic normal.
+
+ المشروع مبني على dataset réelle وعندو تطبيق عملي
+ في مجال Network Security.
+
+ شكراً على المشاهدة — إلا عندك أي سؤال اكتبه في التعليقات."
+
+============================================================
+NOTES TECHNIQUES POUR LE TOURNAGE:
+— Durée totale estimée: ~3:50 min
+— Screen recording: montrer le dashboard HTML en direct
+— Chaque partie = changer de tab dans le dashboard
+— Voix: Darija + termes techniques en français/anglais
+============================================================
